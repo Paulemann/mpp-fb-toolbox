@@ -33,7 +33,7 @@ number = ''
 name   = ''
 search = False
 update = False
-pbPage = 1
+pbPage = 0
 
 if 'QUERY_STRING' in os.environ:
     query_string = os.environ['QUERY_STRING']
@@ -53,9 +53,13 @@ if 'QUERY_STRING' in os.environ:
             if key == 'page':
                 pbPage = int(value)
 
-if update:
-   number = ''
-   name = ''
+if update or pbPage > 0:
+    number = ''
+    name = ''
+
+if pbPage == 0 and not number and not name:
+    pbPage = 1
+
 
 # Localization
 btnBack        = 'Zurück'
