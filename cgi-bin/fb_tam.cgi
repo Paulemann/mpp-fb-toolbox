@@ -8,8 +8,11 @@ from datetime import datetime
 
 import urllib
 import re
+import os
 
 from ConfigParser import ConfigParser
+
+error   = False
 
 cfgFile = 'fb.cfg'
 
@@ -24,19 +27,23 @@ try:
     pbName     = config.get('phonebook', 'name')
     pbAreaCode = config.get('phonebook', 'areacode')
 except:
+    error      = True
+
     fbAddr     = 'fritz.box'
     fbFTPUsr   = 'ftpuser'
     fbFTPPwd   = ''
     pbName     = 'Telefonbuch'
     pbAreaCode = ''
 
-tamFile = '/tmp/meta0'
-pbList  = [ pbName ]
-pbPath  = '/var/www/html/'
+tamFile        = '/tmp/meta0'
+pbList         = [ pbName ]
+pbPath         = '/var/www/html/'
 
+# Localization:
 strTAM         = 'FRITZ!Box Anrufbeantworter'
-strNewMessages = 'neue Nachricht(en)'
+strNewMessages = ' neue Nachricht(en)'
 strAnonymous   = 'Anonymer Anrufer'
+strError       = 'Fehler'
 
 btnExit        = 'Beenden'
 btnDialTAM     = 'AB anrufen'
@@ -44,18 +51,21 @@ btnDialID      = 'Nr. wählen'
 
 dictDayOfWeek  = {'Mon':'Mo', 'Tue':'Di', 'Wed':'Mi', 'Thu':'Do', 'Fri':'Fr', 'Sat':'Sa', 'Sun':'So'}
 
-recordSize = 348
-Message = namedtuple('Message', 'datalength sequence reclength new callerID filename path day month year hours minutes seconds calledID')
+Message        = namedtuple('Message', 'datalength sequence reclength new callerID filename path day month year hours minutes seconds calledID')
+
+recordSize     = 348
+url            = 'ftp://{}:{}@{}/FRITZ/voicebox/meta0'.format(fbFTPUsr, fbFTPPwd, fbAddr)
 
 messages = []
 try:
-    urllib.urlretrieve('ftp://{}:{}@{}/FRITZ/voicebox/meta0'.format(fbFTPUsr, fbFTPPwd, fbAddr), tamFile)
+    urllib.urlretrieve(url, tamFile)
     with open(tamFile, 'rb') as fin:
         for record in iter(partial(fin.read, recordSize), b''):
             message = Message._make(unpack('>2xHB18xB3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
             if message.new > 0:
                 messages.append(message)
 except:
+    error = True
     pass
 
 newmsgs = len(messages)
@@ -103,7 +113,7 @@ def outputLine(msg):
 html_header = 'Content-type: text/xml\n'
 
 # header and footer
-header = '<?xml version="1.0" encoding="UTF-8"?>\n<CiscoIPPhoneMenu>\n\t<Title>{}</Title>\n\t<Prompt>{} {}</Prompt>'
+header = '<?xml version="1.0" encoding="UTF-8"?>\n<CiscoIPPhoneMenu>\n\t<Title>{}</Title>\n\t<Prompt>{}</Prompt>'
 #header = '<?xml version="1.0" encoding="UTF-8"?>\n<CiscoIPPhoneDirectory>\n\t<Title>{}</Title>\n\t<Prompt>{} {}</Prompt>'
 
 footer = '</CiscoIPPhoneMenu>'
@@ -112,7 +122,10 @@ footer = '</CiscoIPPhoneMenu>'
 softKey = '\t<SoftKeyItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t\t<Position>{}</Position>\n\t</SoftKeyItem>'
 
 print html_header
-print header.format(strTAM, newmsgs, strNewMessages)
+if error:
+    print header.format(strTAM, strError)
+else:
+    print header.format(strTAM, str(newmsgs) + strNewMessages)
 
 # read messages in reverse order
 for message in messages[::-1]:

@@ -1,10 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
 import socket
 import fcntl
 import struct
 from fb_toolbox import get_ip_address
+from ConfigParser import ConfigParser
+
+cfgFile = 'fb.cfg'
+
+try:
+    # Read the config file
+    config = ConfigParser()
+    config.read([os.path.abspath(cfgFile)])
+
+    camTitle = config.get('webcam', 'title')
+except:
+    camTitle = ''
 
 myIPAddr = get_ip_address('eth0')
 
@@ -34,6 +47,7 @@ print outLine.format(itemTAM, 'http://{}/cgi-bin/fb_tam.cgi'.format(myIPAddr))
 print outLine.format(itemInCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=1'.format(myIPAddr))
 print outLine.format(itemOutCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=4'.format(myIPAddr))
 print outLine.format(itemMissedCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=2'.format(myIPAddr))
-print outLine.format(itemWebCam, 'http://{}/cgi-bin/pi_webcam.cgi'.format(myIPAddr))
+if camTitle:
+    print outLine.format(itemWebCam, 'http://{}/cgi-bin/pi_webcam.cgi'.format(myIPAddr))
 
 print footer
