@@ -1,7 +1,7 @@
 # mpp-fb-toolbox
 This is a collection of python scripts to be run from the cgi-bin directory of a python enabled web server to display information from your local AVM FRITZ!Box on a Cisco 8800 Series Multiplatform (aka MPP or 3PCC) Phone. For specific instructions related to the configuration of your web service and how to enable the exceution of python scripts, please consult the documentation of your specific software.
 I had this successfully running with apache2 on a Raspberry Pi with a current install of Raspbian.  
-Furthermore, you should be able to access the admin page and be familar with the basic setup of your Cisco 8800 Series Multiplatform Phone. 
+
 
 Prerequisites:
 ==============
@@ -11,7 +11,7 @@ Prerequisites:
 - You must have configured a user (default ftpuser) and password  on your local FRITZ!Box to access the answering machine file via ftp://<your FRITZ!Box ip addess>/FRITZ/voicebox/meta0
 - All required values must have been entered in the file fb.cfg located in the same directory as the script files.
 - Make sure the script files are executable both locally and by the web service.
-
+- Furthermore, you should be able to access the admin page and be familar with the basic setup of your Cisco 8800 Series Multiplatform Phone. 
 
 Restrictions:
 =============
