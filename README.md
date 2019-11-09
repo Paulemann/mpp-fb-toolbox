@@ -59,8 +59,8 @@ Enter http://<Phone IP address>/admin/advanced in the address filed of your bows
 
 Confgure the following settings in section XML Service (names can be adapted according to your preference):
 ```
-XML Directory Service Name:	  FRITZ!Box Phonebook
-XML Directory Service URL:	  http://<web server ip address>/cgi-bin/fb_phonebook.cgi
+XML Directory Service Name:	FRITZ!Box Phonebook
+XML Directory Service URL:	http://<web server ip address>/cgi-bin/fb_phonebook.cgi
 XML Application Service Name:	FRITZ!Box Services
 XML Application Service URL:	http://<web server ip address>/cgi-bin/fb_services.cgi
 ```
