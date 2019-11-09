@@ -22,7 +22,8 @@ except:
 myIPAddr = get_ip_address('eth0')
 
 # Localization
-itemTAM         = 'Anrufbeantworter'
+itemTAM0        = 'Anrufbeantworter'
+#itemTAM1        = 'Anrufbeantworter'
 itemInCalls     = 'Ankommende Anrufe'
 itemOutCalls    = 'Ausgehende Anrufe'
 itemMissedCalls = 'Anrufe in Abwesenheit'
@@ -43,7 +44,8 @@ outLine = '\t<MenuItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t</MenuItem>'
 print html_header
 print header.format(strTitle, strPrompt)
 
-print outLine.format(itemTAM, 'http://{}/cgi-bin/fb_tam.cgi'.format(myIPAddr))
+print outLine.format(itemTAM0, 'http://{}/cgi-bin/fb_tam.cgi?index=0'.format(myIPAddr))
+#print outLine.format(itemTAM1, 'http://{}/cgi-bin/fb_tam.cgi?index=1'.format(myIPAddr))
 print outLine.format(itemInCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=1'.format(myIPAddr))
 print outLine.format(itemOutCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=4'.format(myIPAddr))
 print outLine.format(itemMissedCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=2'.format(myIPAddr))

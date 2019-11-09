@@ -27,7 +27,7 @@ btnUpdt   = 'Aktual.'
 btnExit   = 'Beenden'
 strTitle  = 'Webcam'
 
-camURL   = 'http://{}/cgi-bin/get_stream_hd'.format(myIPAddr)
+camURL   = 'http://{}/cgi-bin/get_stream_hd.cgi'.format(myIPAddr)
 
 # mime type / html header
 #html_header = 'Content-type: text/xml\nConnection: close\nExpires: -1\n'

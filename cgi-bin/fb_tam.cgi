@@ -35,12 +35,26 @@ except:
     pbName     = 'Telefonbuch'
     pbAreaCode = ''
 
-tamFile        = '/tmp/meta0'
+
+tamIndex       = 0
+
+if 'QUERY_STRING' in os.environ:
+    query_string = os.environ['QUERY_STRING']
+    if query_string:
+        SearchParams = [i.split('=') for i in query_string.split('&')] #parse query string
+        for key, value in SearchParams:
+            if key == 'index':
+                tamIndex = int(value)
+
+tmpPath        = '/tmp/'
+tamFile        = tmpPath + 'meta' + str(tamIndex)
+#pbPath         = '/var/www/html/'
+pbPath         = tmpPath
 pbList         = [ pbName ]
-pbPath         = '/var/www/html/'
+
 
 # Localization:
-strTAM         = 'FRITZ!Box Anrufbeantworter'
+strTAM         = 'FRITZ!Box Anrufbeantworter ({})'.format(tamIndex + 1)
 strNewMessages = ' neue Nachricht(en)'
 strAnonymous   = 'Anonymer Anrufer'
 strError       = 'Fehler'
@@ -50,6 +64,7 @@ btnDialTAM     = 'AB anrufen'
 btnDialID      = 'Nr. wählen'
 
 dictDayOfWeek  = {'Mon':'Mo', 'Tue':'Di', 'Wed':'Mi', 'Thu':'Do', 'Fri':'Fr', 'Sat':'Sa', 'Sun':'So'}
+
 
 Message        = namedtuple('Message', 'datalength sequence reclength new callerID filename path day month year hours minutes seconds calledID')
 
@@ -62,6 +77,7 @@ try:
     with open(tamFile, 'rb') as fin:
         for record in iter(partial(fin.read, recordSize), b''):
             message = Message._make(unpack('>2xHB18xB3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
+            # Skip the following check if you want to see old messages, too
             if message.new > 0:
                 messages.append(message)
 except:
@@ -103,10 +119,10 @@ def outputLine(msg):
     else:
         callerID = strAnonymous
 
-    Line = '\t<MenuItem>\n\t\t<Name>{} {} {}: {}</Name>\n\t\t<URL>Dial:{}</URL>\n\t</MenuItem>'
-    #Line = '\t<DirectoryEntry>\n\t\t<Name>{} {} {} {}</Name>\n\t\t<Telephone>{}</Telephone>\n\t</DirectoryEntry>'
+    Line = '\t<MenuItem>\n\t\t<Name>{} {} {}: {} ({})</Name>\n\t\t<URL>Dial:{}</URL>\n\t</MenuItem>'
+    #Line = '\t<DirectoryEntry>\n\t\t<Name>{} {} {}: {} ({})</Name>\n\t\t<Telephone>{}</Telephone>\n\t</DirectoryEntry>'
 
-    print Line.format(locDayOfWeek, dateStr, timeStr, callerID, msg.callerID.rstrip('\0'))
+    print Line.format(locDayOfWeek, dateStr, timeStr, callerID, lenStr, msg.callerID.rstrip('\0'))
 
 
 # mime type / html header
@@ -133,7 +149,7 @@ for message in messages[::-1]:
 
 if newmsgs > 0:
     print softKey.format(btnDialID,'SoftKey:Select', 1)
-print softKey.format(btnDialTAM, 'Dial:**600', 2)
+print softKey.format(btnDialTAM, 'Dial:**60' + str(tamIndex), 2)
 print softKey.format(btnExit, 'Init:Services', 3)
 
 print footer

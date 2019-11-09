@@ -18,7 +18,7 @@ try:
 
     fbAddr = config.get('fritzbox', 'hostname')
     fbPwd  = config.get('fritzbox', 'password')
-    pbName = config.get('phonebook', 'name')
+    pbName = config.get('phonebook', 'name').split(',')[0]
 except:
     fbAddr = 'fritz.box'
     fbPwd  = ''
@@ -60,6 +60,10 @@ if update or pbPage > 0:
 if pbPage == 0 and not number and not name:
     pbPage = 1
 
+#pbPath = '/var/www/html/'
+pbPath = '/tmp/'
+pbFile = pbPath + pbName + '.xml'
+
 
 # Localization
 btnBack        = 'Zurück'
@@ -88,9 +92,6 @@ strMobile      = 'M'
 strWork        = 'A'
 strHome        = 'Z'
 
-
-pbPath     = '/var/www/html'
-pbFile     = '{}/{}.xml'.format(pbPath, pbName)
 
 maxEntries = 32
 
@@ -248,7 +249,7 @@ def fbpb_match(number, name):
     print footer
 
 
-if update or not os.path.isfile(pbFile):
+if update or not os.path.exists(pbFile):
     pbExport = fbpb_export(fbAddr, sid, pbName)
 
 if search:
