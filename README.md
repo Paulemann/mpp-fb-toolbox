@@ -31,36 +31,36 @@ Configuration:
 ============== 
 The configuration file fb.cfg must be created with the below data:
 
-`
+```
 [fritzbox]
 hostname: <Hostname or IP address of the FRITZ!Box; e.g. fritz.box or 192.168.178.1>
-password: <Password to acces the FRITZ!Box web ui >
+password: <Password to access the FRITZ!Box web ui >
 
 [phonebook]
-name: <Phoenbook name; e.g. Telefonbuch>
-areacode:<Optional: your own area code; will shorten the display of local numbers>
+name:     <Phoenbook name; e.g. Telefonbuch>
+areacode: <Optional: your own area code; will shorten the display of local numbers>
 
 [ftp]
-user: <User who can access the NAS directories of your FRITZ!Box via ftp, default: ftpuser>
+user:     <User who can access the NAS directories of your FRITZ!Box via ftp, default: ftpuser>
 password: <Password>
 
 [webcam]
-title: <Optional: title of the webcam snapshots to be displayed>
-url: <URL for the webcam snapshot, e.g.. http://1.1.1.1/snapshot>
-user: <webcam user>
+title:    <Optional: title of the webcam snapshots to be displayed>
+url:      <URL for the webcam snapshot, e.g.. http://1.1.1.1/snapshot>
+user:     <webcam user>
 password: <webcam password>
-width: <For 8851: 559; configure according to model and preference>
-height: <For 8851: 265; configure according to model and preference>
-`
+width:    <For 8851: 559; configure according to model and preference>
+height:   <For 8851: 265; configure according to model and preference>
+```
 
 Phone setup:
 ============
 Enter http://<Phone IP address>/admin/advanced in the address filed of your bowser (login as user "admin" if required) -> Voice -> Phone
 
 Confgure the following settings in section XML Service (names can be adapted according to your preference):
-`
-XML Directory Service Name:	FRITZ!Box Phonebook
-XML Directory Service URL:	http://<web server ip address>/cgi-bin/fb_phonebook.cgi
+```
+XML Directory Service Name:	  FRITZ!Box Phonebook
+XML Directory Service URL:	  http://<web server ip address>/cgi-bin/fb_phonebook.cgi
 XML Application Service Name:	FRITZ!Box Services
 XML Application Service URL:	http://<web server ip address>/cgi-bin/fb_services.cgi
-`
+```
