@@ -46,7 +46,7 @@ password: <Password>
 
 [webcam]
 title:    <Optional: title of the webcam snapshots to be displayed>
-url:      <URL for the webcam snapshot, e.g.. http://1.1.1.1/snapshot>
+url:      <URL for downloading the webcam snapshot, e.g.: http://1.1.1.1/snapshot>
 user:     <webcam user>
 password: <webcam password>
 width:    <For 8851: 559; configure according to model and preference>
