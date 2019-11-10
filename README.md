@@ -78,12 +78,8 @@ Basic configuration:
 ====================
 - Connect the 8800 series phone to the network and a power source (via PoE or power supply). The phone starts up.
 - Assign a password (user password; not admin password!)
-
-- Configure network settings:
-Settings -> Network configuration -> IPv4 address settings (DHCP oder static)
-
-- Check network settings:
-Settings -> Status -> Network status
+- Configure network settings: Settings -> Network configuration -> IPv4 address settings (DHCP oder static)
+- Check network settings: Settings -> Status -> Network status
 
 Further settings will be configured via browser (attention: only MS Internet Explorer/Edge seem to work reliably)
 
@@ -92,23 +88,16 @@ Update Firmware:
 ================
 Enter `http://<Phone IP address>` in the browser address field and login as user "user" and previously assigned password -> Admin-Login (basic)
 
-- Info -> Status:
+- Verify current firmware status and version:
+Info -> Status:
 ```
 Product Information:
 Software Version:    sip88xx.11-0-1MPP-477.loads (Beispiel)
 ```
-
-- Visit software.cisco.com and look for updated firmware:
--> IP Phone 88xx with Multiplatform Firmware
-
-- Multiplatform Firmware
-Download e.g. `cmterm-88xx.11-2-3MSR1-1_REL.zip` and unpack files to directory on tftp server
-
-- Multiplatform Firmware Locale Installer
-Download e.g. `cmterm-68xx_78xx_88xx.11-2-3MPP-398-Locale-1.zip` and extract the file `de-DE_88xx-11.2.3.1000.xml` (this is the German locale file; select accordingly for other languages). Copy the file as `de-DE.xml` to the directory `MPP` on the tftp server
-
-- Back to 88xx Webui:
-`http://<Phone IP address>` -> Login as user  "user" ans previously assigned password -> Admin-Login (advanced)
+- Visit software.cisco.com and look for updated firmware for IP Phone 88xx with Multiplatform Firmware
+- Download Multiplatform Firmware e.g. `cmterm-88xx.11-2-3MSR1-1_REL.zip` and unpack files to directory on tftp server
+- Download Multiplatform Firmware Locale Installer e.g. `cmterm-68xx_78xx_88xx.11-2-3MPP-398-Locale-1.zip` and extract the file `de-DE_88xx-11.2.3.1000.xml` (this is the German locale file; select accordingly for other languages). Copy the file as `de-DE.xml` to the directory `MPP` on the tftp server
+- GO back to 88xx Webui: `http://<Phone IP address>` -> Login as user  "user" ans previously assigned password -> Admin-Login (advanced)
 
 Voice -> Provisioning:
 ```
