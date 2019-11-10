@@ -69,7 +69,7 @@ XML Application Service URL:	http://<Web server IP address>/cgi-bin/fb_services.
 
 Prerequisites:
 ==============
-- You should be able to access to Cisco web site and your CCO account is authorized to download software (required to update firmware on the phone).
+- You should be able to access Cisco's web site and your CCO account must be authorized to download software (required to update firmware on the phone).
 - A local TFTP service for provisioning of firmware and language files is available.
 - The 8800 series phone has been set up as a new telephony device on the FRITZ!Box: FRITZ!Box  -> Telefonie -> Telefoniegeräte -> Neues Gerät einrichten)
 
@@ -88,7 +88,6 @@ Update Firmware:
 ================
 Enter `http://<Phone IP address>` in the browser address field and login as user "user" and previously assigned password -> Admin-Login (basic)
 
-- Verify current firmware status and version:
 Info -> Status:
 ```
 Product Information:
@@ -97,7 +96,7 @@ Software Version:    sip88xx.11-0-1MPP-477.loads (Beispiel)
 - Visit software.cisco.com and look for updated firmware for IP Phone 88xx with Multiplatform Firmware
 - Download Multiplatform Firmware e.g. `cmterm-88xx.11-2-3MSR1-1_REL.zip` and unpack files to directory on tftp server
 - Download Multiplatform Firmware Locale Installer e.g. `cmterm-68xx_78xx_88xx.11-2-3MPP-398-Locale-1.zip` and extract the file `de-DE_88xx-11.2.3.1000.xml` (this is the German locale file; select accordingly for other languages). Copy the file as `de-DE.xml` to the directory `MPP` on the tftp server
-- GO back to 88xx Webui: `http://<Phone IP address>` -> Login as user  "user" ans previously assigned password -> Admin-Login (advanced)
+- Go back to 88xx Webui: `http://<Phone IP address>` -> Login as user  "user" and previously assigned password -> Admin-Login (advanced)
 
 Voice -> Provisioning:
 ```
@@ -109,7 +108,7 @@ Upgrade Rule: tftp://<tftp server IP address>/<path>/sip88xx.11-2-3MSR1-1.loads
 Alternativly, via browser URL:
 `http://<Phone IP address>/admin/upgrade?tftp://<tftp server IP address>/<path>/sip88xx.11-2-3MSR1-1.loads`
 
-Phone reboots automatically after update
+The phone reboots automatically after update
 
 
 Localization:
