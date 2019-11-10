@@ -64,3 +64,177 @@ XML Directory Service URL:	http://<Web server IP address>/cgi-bin/fb_phonebook.c
 XML Application Service Name:	FRITZ!Box Services
 XML Application Service URL:	http://<Web server IP address>/cgi-bin/fb_services.cgi
 ```
+
+# Setup Cisco 8800 Series Multiplatform Phone (MPP) with AVM FRITZ!Box
+
+Prerequisites:
+==============
+- You should be able to access to Cisco web site and your CCO account is authorized to download software (required to update firmware on the phone).
+- A local TFTP service for provisioning of firmware and language files is available.
+- The 8800 series phone has been set up as a new telephony device on the FRITZ!Box: FRITZ!Box  -> Telefonie -> Telefoniegeräte -> Neues Gerät einrichten)
+
+
+Basic configuration:
+====================
+Connect the 8800 series phone to the network and a power source (via PoE or power supply) -> phone starts up.
+Assign a password (user password; not admin password!)
+
+Configure network settings:
+Settings -> Network configuration -> IPv4 address settings (DHCP oder static)
+
+Check network settings:
+Settings -> Status -> Network status
+
+Further settings will be configured via browser (attention: only MS Internet Explorer/Edge seem to work reliably)
+
+
+Update Firmware:
+================
+Enter `http://<Phone IP address>` in the browser address field and login as user "user" and previously assigned password -> Admin-Login (basic)
+
+Info -> Status:
+```
+Product Information:
+Software Version:    sip88xx.11-0-1MPP-477.loads (Beispiel)
+```
+
+Visit software.cisco.com and look for updated firmware:
+-> IP Phone 88xx with Multiplatform Firmware
+
+-> Multiplatform Firmware
+Download e.g. `cmterm-88xx.11-2-3MSR1-1_REL.zip` and unpack files to directory on tftp server
+
+-> Multiplatform Firmware Locale Installer
+Download e.g. `cmterm-68xx_78xx_88xx.11-2-3MPP-398-Locale-1.zip` and extract the file `de-DE_88xx-11.2.3.1000.xml` (this is the German locale file; select accordingly for other languages). Copy the file as `de-DE.xml` to the directory `MPP` on the tftp server
+
+Back to 88xx Webui:
+`http://<Phone IP address>` -> Login as user  "user" ans previously assigned password -> Admin-Login (advanced)
+
+Voice -> Provisioning:
+```
+Firmware Upgrade:
+Upgrade Rule: tftp://<tftp server IP address>/<path>/sip88xx.11-2-3MSR1-1.loads
+```
+-> Submit
+
+Alternativly, via browser URL:
+`http://<Phone IP address>/admin/upgrade?tftp://<tftp server IP address>/<path>/sip88xx.11-2-3MSR1-1.loads`
+
+Phone reboots automatically after update
+
+
+Localization:
+=============
+`http://<phone IP address>` -> login as user "user" and previously assigne password  -> Admin-Login (advanced)
+
+Voice -> Regional:
+```
+Time (example for CET Time Zone setting):
+Time Zone: GMT+1:00
+Daylight Saving Time Rule: start=3/-1/7/2;end=10/-1/7/2;save=1
+Daylight Saving Time Enable: Yes
+
+Language (example for German locale):
+Dictionary Server Script: serv=tftp://<tftp server IP address>/MPP/;d1=German;l1=de-DE;x1=de-DE.xml
+Language Selection: German
+Locale: de-DE
+```
+-> Submit
+
+
+Configuration:
+==============
+`http://<IP-Adresse>` -> login as user "user" and previously assigne password  -> Admin-Login (advanced)
+
+Voice -> System
+```
+System Configuration:
+Admin Password: <Change Password>
+Phone-UI-User-Mode: Yes
+```
+-> Submit
+
+Voice -> Phone
+```
+General:
+Station Name: <Telefonnummer>
+Voice Mail Numer: **600
+
+Line Key 1: 
+Extension: 1
+
+Line Key 2 to 10 (Configure your speed dials):
+Extension: Disabled
+Extended Function: fnc=sd;ext=<Telefonnummer>@$PROXY;vid=1;nme=<Anzeigename>
+```
+-> Submit
+
+Voice -> Ext1
+```
+General:
+Line Enable: Yes
+
+Call Feature Settings:
+Mailbox ID: $USER
+Voice Mail Server: $USER@<FRITZ!Box IP address>
+
+Proxy and Registration:
+Proxy: <FRITZ!Box IP address>
+
+Subscriber Information:
+Display Name: <Individual display name>
+User Name: <FRITZ!Box telephony device user name>
+Passsword: <FIRTZ!Box telephony device password>
+
+Dial Plan:
+Dial Plan: (**x|*xx|**xxx|[3469]11|0|00|[2-9]xxxxxx|1xxx[2-9]xxxxxxS0|xxxxxxxxxxxx.)
+```
+-> Submit
+
+Voice -> User
+```
+Supplementary Services:
+Time Format: 24hr
+Date Format: day/month
+
+Audio Compliance:
+Compliant Standard: ETSI
+```
+-> Submit
+
+Voice -> Ext 2 to Ext 10
+```
+General:
+Line Enable: No
+```
+-> Submit
+
+
+Read/Restore configuration from file:
+=====================================
+`http://<phone IP address>` -> login as user "user" and previously assigned password  -> Admin-Login (advanced)
+
+Voice -> Provioning:
+```
+Configuration Profile:
+Profile Rule: tftp://<tftp server IP address>/<path>/<file name>
+```
+-> Submit
+
+
+Optional control via browser:
+=============================
+- Show (and save) current configuration:
+`http://<Phone IP address>/admin/spacfg.xml`
+
+- Read/Restore configuration from file:
+`http://<Phone IP adddress>/admin/resync?tftp://<tftp server IP address>/<path>/<file name>`
+
+- View log messages:
+`http://<Phone IP address>/admin/log/messages`
+
+
+Documentation:
+==============
+- Release Notes: https://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cuipph/MPP/8800/firmware/11-2-3/p881_b_11_2_3.html
+- Admin Guide: https://www.cisco.com/c/en/us/td/docs/voice_ip_comm/cuipph/MPP/8800/english/adminguide/p881_b_8800-mpp-ag.html
