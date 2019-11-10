@@ -22,7 +22,7 @@ Restrictions:
 Optional:
 =========
 - If you have a webcam that can generate snapshots in jpeg format, a menu entry is added by configuration of the respective snapshot url to display the snapshot on the screen of your Cisco IP phone.
-- It is not a strict prerequisite, but it makes sense that - prior to the installation of the scripts - you have setup the Cisco 8800 IP Phone to register as a SIP client at your local FRITZ!Box and you are able to make calls with your phone.
+- It is not a strict prerequisite, but it makes sense that - prior to the installation of the scripts - you have setup the Cisco 8800 IP Phone to register as a SIP client at your local FRITZ!Box and you are able to make calls with your phone. See section "Setup Cisco 8800 Series Multiplatform Phone (MPP) with AVM FRITZ!Box" if you're looking for guidance on how to setup the phone.
 
 Test the installation by entering `http://<Web server IP address>/cgi-bin/fb_services.cgi` in the address field of your brwoser. You should be able to see the XML code the script has generated. If not, you must troubleshoot your setup.
 
@@ -76,13 +76,13 @@ Prerequisites:
 
 Basic configuration:
 ====================
-Connect the 8800 series phone to the network and a power source (via PoE or power supply) -> phone starts up.
-Assign a password (user password; not admin password!)
+- Connect the 8800 series phone to the network and a power source (via PoE or power supply). The phone starts up.
+- Assign a password (user password; not admin password!)
 
-Configure network settings:
+- Configure network settings:
 Settings -> Network configuration -> IPv4 address settings (DHCP oder static)
 
-Check network settings:
+- Check network settings:
 Settings -> Status -> Network status
 
 Further settings will be configured via browser (attention: only MS Internet Explorer/Edge seem to work reliably)
@@ -92,22 +92,22 @@ Update Firmware:
 ================
 Enter `http://<Phone IP address>` in the browser address field and login as user "user" and previously assigned password -> Admin-Login (basic)
 
-Info -> Status:
+- Info -> Status:
 ```
 Product Information:
 Software Version:    sip88xx.11-0-1MPP-477.loads (Beispiel)
 ```
 
-Visit software.cisco.com and look for updated firmware:
+- Visit software.cisco.com and look for updated firmware:
 -> IP Phone 88xx with Multiplatform Firmware
 
--> Multiplatform Firmware
+- Multiplatform Firmware
 Download e.g. `cmterm-88xx.11-2-3MSR1-1_REL.zip` and unpack files to directory on tftp server
 
--> Multiplatform Firmware Locale Installer
+- Multiplatform Firmware Locale Installer
 Download e.g. `cmterm-68xx_78xx_88xx.11-2-3MPP-398-Locale-1.zip` and extract the file `de-DE_88xx-11.2.3.1000.xml` (this is the German locale file; select accordingly for other languages). Copy the file as `de-DE.xml` to the directory `MPP` on the tftp server
 
-Back to 88xx Webui:
+- Back to 88xx Webui:
 `http://<Phone IP address>` -> Login as user  "user" ans previously assigned password -> Admin-Login (advanced)
 
 Voice -> Provisioning:
