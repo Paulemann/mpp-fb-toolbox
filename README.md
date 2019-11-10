@@ -24,7 +24,7 @@ Optional:
 - If you have a webcam that can generate snapshots in jpeg format, a menu entry is added by configuration of the respective snapshot url to display the snapshot on the screen of your Cisco IP phone.
 - It is not a strict prerequisite, but it makes sense that - prior to the installation of the scripts - you have setup the Cisco 8800 IP Phone to register as a SIP client at your local FRITZ!Box and you are able to make calls with your phone.
 
-Test the installation by entering `http://<web server ip address>/cgi-bin/fb_services.cgi` in the address field of your brwoser. You should be able to see the XML code the script has generated. If not, you must troubleshoot your setup.
+Test the installation by entering `http://<Web server IP address>/cgi-bin/fb_services.cgi` in the address field of your brwoser. You should be able to see the XML code the script has generated. If not, you must troubleshoot your setup.
 
 
 Configuration:
@@ -60,7 +60,7 @@ Enter `http://<Phone IP address>/admin/advanced` in the address filed of your bo
 Confgure the following settings in section XML Service (names can be adapted according to your preference):
 ```
 XML Directory Service Name:	FRITZ!Box Phonebook
-XML Directory Service URL:	http://<web server ip address>/cgi-bin/fb_phonebook.cgi
+XML Directory Service URL:	http://<Web server IP address>/cgi-bin/fb_phonebook.cgi
 XML Application Service Name:	FRITZ!Box Services
-XML Application Service URL:	http://<web server ip address>/cgi-bin/fb_services.cgi
+XML Application Service URL:	http://<Web server IP address>/cgi-bin/fb_services.cgi
 ```
