@@ -6,6 +6,7 @@ import sys
 import os
 import xml.etree.ElementTree as ET
 
+from tempfile import gettempdir
 from ConfigParser import ConfigParser
 from fb_toolbox import *
 
@@ -61,7 +62,8 @@ if pbPage == 0 and not number and not name:
     pbPage = 1
 
 #pbPath = '/var/www/html/'
-pbPath = '/tmp/'
+#pbPath = '/tmp/'
+pbPath = gettempdir() + '/'
 pbFile = pbPath + pbName + '.xml'
 
 
@@ -145,8 +147,12 @@ def fbpb_export(server, sid, name):
     with open(pbFile, 'w') as xmlfile:
         xmlfile.write(header.format(pbName, strSelUsr) + '\n')
         for phonebook in phonebooks:
-            if not phonebook.attrib['name'] == pbName:
-                continue
+            try:
+                if not phonebook.attrib['name'] == pbName:
+                    continue
+            except:
+                # exception may occur, when there is only a single phonebook and no name assigned
+                pass
             for contact in phonebook.iter('contact'):
                 for element in contact:
                     if element.tag == 'person':
@@ -163,7 +169,6 @@ def fbpb_export(server, sid, name):
                                 else:
                                     xmlfile.write(outLine.format(name.encode('UTF-8'), number) + '\n')
         xmlfile.write(footer + '\n')
-
 
 def fbpb_print(page):
     with open(pbFile, 'r') as xmlfile:
