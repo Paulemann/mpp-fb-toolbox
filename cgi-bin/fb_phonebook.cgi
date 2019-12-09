@@ -61,11 +61,7 @@ if update or pbPage > 0:
 if pbPage == 0 and not number and not name:
     pbPage = 1
 
-#pbPath = '/var/www/html/'
-#pbPath = '/tmp/'
-pbPath = gettempdir() + '/'
-pbFile = pbPath + pbName + '.xml'
-
+pbFile = os.path.join(gettempdir(), pbName + '.xml')
 
 # Localization
 btnBack        = 'Zurück'

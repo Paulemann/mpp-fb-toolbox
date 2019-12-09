@@ -5,6 +5,7 @@ from struct import *
 from functools import partial
 from collections import namedtuple
 from datetime import datetime
+from tempfile import gettempdir
 
 import urllib
 import re
@@ -35,7 +36,6 @@ except:
     pbName     = 'Telefonbuch'
     pbAreaCode = ''
 
-
 tamIndex       = 0
 
 if 'QUERY_STRING' in os.environ:
@@ -46,11 +46,8 @@ if 'QUERY_STRING' in os.environ:
             if key == 'index':
                 tamIndex = int(value)
 
-tmpPath        = '/tmp/'
-tamFile        = tmpPath + 'meta' + str(tamIndex)
-#pbPath         = '/var/www/html/'
-pbPath         = tmpPath
-pbList         = [ pbName ]
+tamFile = os.path.join(gettempdir(), 'meta' + str(tamIndex))
+pbList  = [ pbName ]
 
 
 # Localization:
@@ -89,7 +86,7 @@ newmsgs = len(messages)
 mapping = []
 try:
     for pbFile in pbList:
-        with open(pbPath + pbFile + '.xml') as file:
+        with open(os.path.join(gettempdir(), pbFile + '.xml')) as file:
              pb = file.read()
         mapping.extend(re.findall(r'<Name>(.*)</Name>\s*<Telephone>(.*)</Telephone>', pb))
 except:

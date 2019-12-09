@@ -74,7 +74,7 @@ def _encode_multipart_formdata(fields, files):
         L.append(value)
     for (key, fd) in files:
         file_size = os.fstat(fd.fileno())[stat.ST_SIZE]
-        filename = fd.name.split('/')[-1]
+        filename = os.path.split(fd.name)[1]
         contenttype = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
         L.append('--%s' % BOUNDARY)
         L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
