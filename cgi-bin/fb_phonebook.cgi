@@ -61,7 +61,8 @@ if update or pbPage > 0:
 if pbPage == 0 and not number and not name:
     pbPage = 1
 
-pbFile = os.path.join(gettempdir(), pbName + '.xml')
+tmpPath = gettempdir()
+pbFile  = os.path.join(tmpPath, pbName + '.xml')
 
 # Localization
 btnBack        = 'Zurück'

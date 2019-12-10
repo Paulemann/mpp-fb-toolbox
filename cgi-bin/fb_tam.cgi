@@ -46,7 +46,8 @@ if 'QUERY_STRING' in os.environ:
             if key == 'index':
                 tamIndex = int(value)
 
-tamFile = os.path.join(gettempdir(), 'meta' + str(tamIndex))
+tmpPath = gettempdir()
+tamFile = os.path.join(tmpPath, 'meta' + str(tamIndex))
 pbList  = [ pbName ]
 
 
@@ -63,7 +64,7 @@ btnDialID      = 'Nr. wählen'
 dictDayOfWeek  = {'Mon':'Mo', 'Tue':'Di', 'Wed':'Mi', 'Thu':'Do', 'Fri':'Fr', 'Sat':'Sa', 'Sun':'So'}
 
 
-Message        = namedtuple('Message', 'datalength sequence reclength new callerID filename path day month year hours minutes seconds calledID')
+Message        = namedtuple('Message', 'datalength reclength new callerID filename path day month year hours minutes seconds calledID')
 
 recordSize     = 348
 url            = 'ftp://{}:{}@{}/FRITZ/voicebox/meta0'.format(fbFTPUsr, fbFTPPwd, fbAddr)
@@ -73,7 +74,13 @@ try:
     urllib.urlretrieve(url, tamFile)
     with open(tamFile, 'rb') as fin:
         for record in iter(partial(fin.read, recordSize), b''):
-            message = Message._make(unpack('>2xHB18xB3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
+            # Byte order
+            if record[0] == '\x5c':
+                byteOrder = '<'   # little-endian (eg. 7530)
+            else:
+                byteOrder = '>'   # big-endian (e.g. 7390,7490,7590)
+            #message = Message._make(unpack('>2xH19xB3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
+            message = Message._make(unpack(byteOrder + 'I16xI3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
             # Skip the following check if you want to see old messages, too
             if message.new > 0:
                 messages.append(message)
@@ -86,7 +93,7 @@ newmsgs = len(messages)
 mapping = []
 try:
     for pbFile in pbList:
-        with open(os.path.join(gettempdir(), pbFile + '.xml')) as file:
+        with open(os.path.join(tmpPath, pbFile + '.xml')) as file:
              pb = file.read()
         mapping.extend(re.findall(r'<Name>(.*)</Name>\s*<Telephone>(.*)</Telephone>', pb))
 except:
@@ -98,8 +105,7 @@ def outputLine(msg):
     locDayOfWeek = dictDayOfWeek[DayOfWeek]
 
     timeStr = '{:02d}:{:02d}'.format(msg.hours, msg.minutes)
-
-    lenStr = '{:d}:{:02d}'.format(msg.reclength/60, msg.reclength%60)
+    lenStr  = '{:d}:{:02d}'.format(msg.reclength/60, msg.reclength%60)
 
     callerName = ''
     if msg.callerID:
