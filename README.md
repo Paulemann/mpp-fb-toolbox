@@ -221,6 +221,9 @@ Optional control via browser:
 - View log messages:
 `http://<Phone IP address>/admin/log/messages`
 
+- Reboot:
+`http://<Phone IP address>/reboot`
+
 
 Documentation:
 ==============
