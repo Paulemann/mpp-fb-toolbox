@@ -16,8 +16,13 @@ Prerequisites:
 Restrictions:
 =============
 - Currently the location where the phonebook and answering machines file are stored is hardcoded as `/tmp/`. If this path is not accessible or doesn't exist  you must edit the value of tmpPath or pbPath, respectively, in the files fb_phonebook.cgi and fb_tam.cgi. 
-- Without further adaptions, only one (the first) answering machine is supported. If you have multiple answering machines configured, you must edit the fb_services.cgi script file. There are two (currently inactive) lines that will display the respective menu entry and new messages for a second answering machine. You'll easily recognize the scheme to add more answering machines. I intend to make this configurable in fb.cfg to avoid manual editing of the scripts in the future.  
 
+Improvements:
+=============
+- The structure of fb.cfg has been changed to allow the use of multiple phone books. Phone books are referenced by their owner/id: 0 = main phonebook, 1-239 = user defined phonebooks, 240-253 = online phonebooks, 255 = intern, 256 = clip info.
+You must configure a name for each id which may differ from the name that's specified in the FRITZ!Box ui. 
+- You may now configure multiple answering machines in fb.cfg under the new section [answering machine]. The configuration follows the same scheme as for the phone books. 
+- In case you've configured your box to use a user name and password combo instead of password only for login you can now configure the user name in fb.cfg. 
 
 Optional:
 =========
@@ -34,11 +39,17 @@ The configuration file fb.cfg must be created with the below data:
 ```
 [fritzbox]
 hostname: <Hostname or IP address of the FRITZ!Box; e.g. fritz.box or 192.168.178.1>
+username: <User name to access the FRITZ!Box web ui - in case it's been configured, else empty>
 password: <Password to access the FRITZ!Box web ui >
 
 [phonebook]
-name:     <Phoenbook name; e.g. Telefonbuch>
+names:    <Phonebook names, separated by comma if there are multiple; e.g. Telefonbuch, Telefonbuch 2>
+ids:      <Phonebook ids, separated by comma if there are multiple; e.g. 0, 1>
 areacode: <Optional: your own area code; will shorten the display of local numbers>
+
+[answering machine]
+names:    <Answering machine names, separated by comma if there are multiple; e.g. Anrufbeantworter, AB 2>
+ids:      <Answering machine ids, separated by comma if there are multiple; e.g. 0, 1>
 
 [ftp]
 user:     <User who can access the NAS directories of your FRITZ!Box via ftp, default: ftpuser>
@@ -58,9 +69,17 @@ Phone setup:
 Enter `http://<Phone IP address>/admin/advanced` in the address filed of your bowser (login as user "admin" if required) -> Voice -> Phone
 
 Confgure the following settings in section XML Service (names can be adapted according to your preference):
+In case you want to use a spefice phonebook only (with its id used as a parameter to ?book=):
 ```
 XML Directory Service Name:	FRITZ!Box Phonebook
-XML Directory Service URL:	http://<Web server IP address>/cgi-bin/fb_phonebook.cgi
+XML Directory Service URL:	http://<Web server IP address>/cgi-bin/fb_phonebook.cgi?book=1
+```
+or in case you want to access all available/configured phonebooks:
+```
+XML Directory Service Name:	FRITZ!Box Phonebooks
+XML Directory Service URL:	http://<Web server IP address>/cgi-bin/fb_directory.cgi
+```
+```
 XML Application Service Name:	FRITZ!Box Services
 XML Application Service URL:	http://<Web server IP address>/cgi-bin/fb_services.cgi
 ```
