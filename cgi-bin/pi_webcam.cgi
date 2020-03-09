@@ -8,6 +8,14 @@ import struct
 from fb_toolbox import get_ip_address
 from ConfigParser import ConfigParser
 
+
+# Localization
+btnBack   = 'Zurück'
+btnUpdt   = 'Aktual.'
+btnExit   = 'Beenden'
+strTitle  = 'Webcam'
+
+
 cfgFile = 'fb.cfg'
 
 try:
@@ -20,12 +28,6 @@ except:
     camTitle = ''
 
 myIPAddr = get_ip_address('eth0')
-
-# Localization
-btnBack   = 'Zurück'
-btnUpdt   = 'Aktual.'
-btnExit   = 'Beenden'
-strTitle  = 'Webcam'
 
 camURL   = 'http://{}/cgi-bin/get_stream_hd.cgi'.format(myIPAddr)
 

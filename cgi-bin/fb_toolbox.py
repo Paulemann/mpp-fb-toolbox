@@ -106,7 +106,7 @@ def getPage(server, sid, page, port=80):
     else:
         return data
 
-def loginToServer(server,password,port=80):
+def loginToServer(server, user, password, port=80):
 
     conn = httplib.HTTPConnection(server+':'+str(port))
 
@@ -140,7 +140,10 @@ def loginToServer(server,password,port=80):
                 "Content-Type" : "application/x-www-form-urlencoded",
                 "User-Agent" : USER_AGENT}
 
-    loginPage="/login_sid.lua?&response=" + response_bf
+    if not user:
+        loginPage="/login_sid.lua?&response=" + response_bf
+    else:
+        loginPage="/login_sid.lua?username=" + user + "&response=" + response_bf
     conn.request("GET", loginPage, '', headers)
     response = conn.getresponse()
     data = response.read()

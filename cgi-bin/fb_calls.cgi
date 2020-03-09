@@ -6,6 +6,21 @@ import os
 from ConfigParser import ConfigParser
 from fb_toolbox import *
 
+
+# Localization
+btnDial   = 'Anrufen'
+btnExit   = 'Beenden'
+strTitle  = 'FRITZ!Box Anrufliste'
+lstPrompt = ['Ankommende Anrufe', 'Anrufe in Abwesenheit', 'Abgelehnte Anrufe', 'Ausgehende Anrufe']
+
+#1      Ankommender Anruf
+#2      Anruf in Abwesenheit
+#3      Der Anruf wurde abgelehnt. In der FRITZ!Box war zum Zeitpunkt des Anrufs eine Rufsperre für die Rufnummer des Anrufers eingerichtet oder Sie haben am Telefon die$
+#4      Ausgehender Anruf
+#5      Ankommender Anruf. Das Gespräch war noch nicht beendet, als die Anrufliste gesichert wurde.
+#6      Ausgehender Anruf. Das Gespräch war noch nicht beendet, als die Anrufliste gesichert wurde.
+
+
 cfgFile = 'fb.cfg'
 
 try:
@@ -14,12 +29,14 @@ try:
     config.read([os.path.abspath(cfgFile)])
 
     fbAddr = config.get('fritzbox', 'hostname')
+    fbUsr  = config.get('fritzbox', 'username')
     fbPwd  = config.get('fritzbox', 'password')
 except:
     fbAddr = 'fritz.box'
+    fbUsr  = ''
     fbPwd  = ''
 
-sid = loginToServer(fbAddr, fbPwd)
+sid = loginToServer(fbAddr, fbUsr, fbPwd)
 
 if not sid:
     sys.exit(1)
@@ -34,18 +51,6 @@ if 'QUERY_STRING' in os.environ:
             if key == 'type':
                 type = int(value)
 
-#1      Ankommender Anruf
-#2      Anruf in Abwesenheit
-#3      Der Anruf wurde abgelehnt. In der FRITZ!Box war zum Zeitpunkt des Anrufs eine Rufsperre für die Rufnummer des Anrufers eingerichtet oder Sie haben am Telefon die$
-#4      Ausgehender Anruf
-#5      Ankommender Anruf. Das Gespräch war noch nicht beendet, als die Anrufliste gesichert wurde.
-#6      Ausgehender Anruf. Das Gespräch war noch nicht beendet, als die Anrufliste gesichert wurde.
-
-# Localization
-btnDial   = 'Anrufen'
-btnExit   = 'Beenden'
-strTitle  = 'FRITZ!Box Anrufliste'
-lstPrompt = ['Ankommende Anrufe', 'Anrufe in Abwesenheit', 'Abgelehnte Anrufe', 'Ausgehende Anrufe']
 strPrompt = lstPrompt[ type - 1 ]
 
 page = getPage(fbAddr, sid, "/fon_num/foncalls_list.lua?sid=" + sid + "&csv=")

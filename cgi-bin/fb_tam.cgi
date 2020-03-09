@@ -13,46 +13,9 @@ import os
 
 from ConfigParser import ConfigParser
 
-error   = False
-
-cfgFile = 'fb.cfg'
-
-try:
-    # Read the config file
-    config = ConfigParser()
-    config.read([os.path.abspath(cfgFile)])
-
-    fbAddr     = config.get('fritzbox', 'hostname')
-    fbFTPUsr   = config.get('ftp', 'user')
-    fbFTPPwd   = config.get('ftp', 'password')
-    pbName     = config.get('phonebook', 'name')
-    pbAreaCode = config.get('phonebook', 'areacode')
-except:
-    error      = True
-
-    fbAddr     = 'fritz.box'
-    fbFTPUsr   = 'ftpuser'
-    fbFTPPwd   = ''
-    pbName     = 'Telefonbuch'
-    pbAreaCode = ''
-
-tamIndex       = 0
-
-if 'QUERY_STRING' in os.environ:
-    query_string = os.environ['QUERY_STRING']
-    if query_string:
-        SearchParams = [i.split('=') for i in query_string.split('&')] #parse query string
-        for key, value in SearchParams:
-            if key == 'index':
-                tamIndex = int(value)
-
-tmpPath = gettempdir()
-tamFile = os.path.join(tmpPath, 'meta' + str(tamIndex))
-pbList  = [ pbName ]
-
 
 # Localization:
-strTAM         = 'FRITZ!Box Anrufbeantworter ({})'.format(tamIndex + 1)
+strTAM         = 'Anrufbeantworter'
 strNewMessages = ' neue Nachricht(en)'
 strAnonymous   = 'Anonymer Anrufer'
 strError       = 'Fehler'
@@ -64,10 +27,63 @@ btnDialID      = 'Nr. wählen'
 dictDayOfWeek  = {'Mon':'Mo', 'Tue':'Di', 'Wed':'Mi', 'Thu':'Do', 'Fri':'Fr', 'Sat':'Sa', 'Sun':'So'}
 
 
-Message        = namedtuple('Message', 'datalength reclength new callerID filename path day month year hours minutes seconds calledID')
+cfgFile    = 'fb.cfg'
+pbFileName = 'phonebook'
 
+error      = False
+
+try:
+    # Read the config file
+    config = ConfigParser()
+    config.read([os.path.abspath(cfgFile)])
+
+    fbAddr     = config.get('fritzbox', 'hostname')
+    fbFTPUsr   = config.get('ftp', 'user')
+    fbFTPPwd   = config.get('ftp', 'password')
+
+    pbIds      = [int(id.strip()) for id in config.get('phonebook', 'ids').split(',')]
+    pbAreaCode = config.get('phonebook', 'areacode')
+
+    tamNames   = [name.strip() for name in config.get('answering machine', 'names').split(',')]
+    tamIds     = [int(id.strip()) for id in config.get('answering machine', 'ids').split(',')]
+except:
+    error      = True
+
+    fbAddr     = 'fritz.box'
+    fbFTPUsr   = 'ftpuser'
+    fbFTPPwd   = ''
+
+    pbIds      = [0]
+    pbAreaCode = ''
+
+    tamNames   = [strTAM]
+    tamIds     = [0]
+
+tamId          = 0
+
+if 'QUERY_STRING' in os.environ:
+    query_string = os.environ['QUERY_STRING']
+    if query_string:
+        SearchParams = [i.split('=') for i in query_string.split('&')] #parse query string
+        for key, value in SearchParams:
+            if key == 'index':
+                tamId = int(value)
+
+strTAMTitle    = 'FRITZ!Box {}'.format(tamNames[tamIds.index(tamId)])
+
+Message        = namedtuple('Message', 'datalength sequence type filelength reclength new callerID filename path day month year hours minutes seconds calledID')
 recordSize     = 348
-url            = 'ftp://{}:{}@{}/FRITZ/voicebox/meta0'.format(fbFTPUsr, fbFTPPwd, fbAddr)
+
+url            = 'ftp://{}:{}@{}/FRITZ/voicebox/meta{}'.format(fbFTPUsr, fbFTPPwd, fbAddr, tamId)
+
+tmpPath        = gettempdir()
+tamFile        = os.path.join(tmpPath, 'meta' + str(tamId))
+pbList         = [ pbFileName ] if 0 in pbIds else []
+
+try:
+    pbList.extend([ pbFileName + '{}'.format(id + 1) for id in pbIds if id > 0 ])
+except:
+    pass
 
 messages = []
 try:
@@ -79,11 +95,27 @@ try:
                 byteOrder = '<'   # little-endian (eg. 7530)
             else:
                 byteOrder = '>'   # big-endian (e.g. 7390,7490,7590)
-            #message = Message._make(unpack('>2xH19xB3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
-            message = Message._make(unpack(byteOrder + 'I16xI3xH23x15s57x15s17x60s68xBBBBBB30x10s18x', record))
+            message = Message._make(unpack(byteOrder + 'III4xIII24x15s57x15s17x60s68xBBBBBB30x10s18x', record))
             # Skip the following check if you want to see old messages, too
             if message.new > 0:
                 messages.append(message)
+
+            #print "[000:003] Datalength: ", message.datalength  # Unsigned Integer (4 Bytes): 384                          I
+            #print "[004:007] Sequence:   ", message.sequence    # Unsigned Integer:                                        I
+            #print "[008:011] Type:       ", message.type        # Unsigned Integer, follwoed by 4 Bytes:                   I4x
+            #print "[016:019] Filelenth:  ", message.filelength  # Unsigned Integer:                                        I
+            #print "[020:023] Reclength:  ", message.reclength   # Unsigned Integer:                                        I
+            #print "[024:027] New:        ", message.new         # Unsigned Integer, followed by 24 Bytes:                  I24x
+            #print "[052:066] CallerID:   ", message.callerID    # String of 15 Bytes followed by 57 Bytes:                 15s57x
+            #print "[124:138] Filename:   ", message.filename    # String of 15 Bytes followed by 17 Bytes:                 15s17x
+            #print "[156:215] Path:       ", message.path        # String of 60 Bytes followed by 68 Bytes:                 60s68x
+            #print "[284:284] Day:        ", message.day         # Unsigned Char (1 Byte):                                  B
+            #print "[285:285] Month:      ", message.month       # Unsigned Char (1 Byte):                                  B
+            #print "[286:286] Year:       ", message.year        # Unsigned Char (1 Byte):                                  B
+            #print "[287:287] Hours:      ", message.hours       # Unsigned Char (1 Byte):                                  B
+            #print "[288:288] Minutes:    ", message.minutes     # Unsigned Char (1 Byte):                                  B
+            #print "[289:289] Seconds:    ", message.seconds     # Unsigned Char (1 Byte) followed by 30 Bytes:             B30x
+            #print "[320:329] CalledID:   ", message.calledID    # String of 10 Bytes followed by 18 Bytes:                 10s18x
 except:
     error = True
     pass
@@ -142,9 +174,9 @@ softKey = '\t<SoftKeyItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t\t<Positio
 
 print html_header
 if error:
-    print header.format(strTAM, strError)
+    print header.format(strTAMTitle, strError)
 else:
-    print header.format(strTAM, str(newmsgs) + strNewMessages)
+    print header.format(strTAMTitle, str(newmsgs) + strNewMessages)
 
 # read messages in reverse order
 for message in messages[::-1]:
@@ -152,7 +184,7 @@ for message in messages[::-1]:
 
 if newmsgs > 0:
     print softKey.format(btnDialID,'SoftKey:Select', 1)
-print softKey.format(btnDialTAM, 'Dial:**60' + str(tamIndex), 2)
+print softKey.format(btnDialTAM, 'Dial:**60' + str(tamId), 2)
 print softKey.format(btnExit, 'Init:Services', 3)
 
 print footer

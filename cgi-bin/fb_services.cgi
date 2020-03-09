@@ -1,12 +1,26 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
 import os
 import socket
 import fcntl
 import struct
 from fb_toolbox import get_ip_address
 from ConfigParser import ConfigParser
+
+
+# Localization
+itemInCalls     = 'Ankommende Anrufe'
+itemOutCalls    = 'Ausgehende Anrufe'
+itemMissedCalls = 'Anrufe in Abwesenheit'
+itemWebCam      = 'Webcam Schnappschuß'
+
+strTAM          = 'Anrufbeantworter'
+
+strSvcTitle     = 'FRITZ!Box Dienste'
+strSvcPrompt    = ''
+
 
 cfgFile = 'fb.cfg'
 
@@ -15,22 +29,18 @@ try:
     config = ConfigParser()
     config.read([os.path.abspath(cfgFile)])
 
+    tamNames = [name.strip() for name in config.get('answering machine', 'names').split(',')]
+    tamIds   = [int(id.strip()) for id in config.get('answering machine', 'ids').split(',')]
     camTitle = config.get('webcam', 'title')
 except:
+    tamNames = [strTAM]
+    tamIds   = [0]
     camTitle = ''
 
+if len(tamNames) != len(tamIds):
+    sys.exit(1)
+
 myIPAddr = get_ip_address('eth0')
-
-# Localization
-itemTAM0        = 'Anrufbeantworter'
-#itemTAM1        = 'Anrufbeantworter'
-itemInCalls     = 'Ankommende Anrufe'
-itemOutCalls    = 'Ausgehende Anrufe'
-itemMissedCalls = 'Anrufe in Abwesenheit'
-itemWebCam      = 'Webcam Schnappschuß'
-
-strTitle  = 'FRITZ!Box Dienste'
-strPrompt = ''
 
 # mime type / html header
 html_header = 'Content-type: text/xml\n'
@@ -42,10 +52,11 @@ footer = '</CiscoIPPhoneMenu>'
 outLine = '\t<MenuItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t</MenuItem>'
 
 print html_header
-print header.format(strTitle, strPrompt)
+print header.format(strSvcTitle, strSvcPrompt)
 
-print outLine.format(itemTAM0, 'http://{}/cgi-bin/fb_tam.cgi?index=0'.format(myIPAddr))
-#print outLine.format(itemTAM1, 'http://{}/cgi-bin/fb_tam.cgi?index=1'.format(myIPAddr))
+for tamId in tamIds:
+    tamName = tamNames[tamIds.index(tamId)]
+    print outLine.format(tamName, 'http://{}/cgi-bin/fb_tam.cgi?index={}'.format(myIPAddr, tamId))
 print outLine.format(itemInCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=1'.format(myIPAddr))
 print outLine.format(itemOutCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=4'.format(myIPAddr))
 print outLine.format(itemMissedCalls, 'http://{}/cgi-bin/fb_calls.cgi?type=2'.format(myIPAddr))
