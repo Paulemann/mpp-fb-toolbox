@@ -224,19 +224,18 @@ def fbpb_print(lines, page):
             print lines[i],
 
     print softKey.format(btnDial, 'SoftKey:Dial', 1)
-    print softKey.format(btnEdit, 'SoftKey:EditDial', 2)
 
     if page > 1:
         prev = page - 1
-        print softKey.format(btnBack, myURL + '&amp;page=' + str(prev), 3)
-    else:
-        print softKey.format(btnUpdate, myURL + '&amp;update=1', 3)
+        print softKey.format(btnBack, myURL + '&amp;page=' + str(prev), 2)
 
     if page < pages:
         next = page + 1
-        print softKey.format(btnNext, myURL + '&amp;page=' + str(next), 4)
-    else:
-        print softKey.format(btnSearch, myURL + '&amp;search=1', 4)
+        print softKey.format(btnNext, myURL + '&amp;page=' + str(next), 3)
+
+    print softKey.format(btnEdit, 'SoftKey:EditDial', 4)
+    print softKey.format(btnSearch, myURL + '&amp;search=1', 5)
+    print softKey.format(btnUpdate, myURL + '&amp;update=1', 6)
 
     print lines[-1]
 

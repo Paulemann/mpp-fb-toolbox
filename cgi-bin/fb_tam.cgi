@@ -44,6 +44,7 @@ try:
     pbIds      = [int(id.strip()) for id in config.get('phonebook', 'ids').split(',')]
     pbAreaCode = config.get('phonebook', 'areacode')
 
+    tamPath    = config.get('answering machine', 'path')
     tamNames   = [name.strip() for name in config.get('answering machine', 'names').split(',')]
     tamIds     = [int(id.strip()) for id in config.get('answering machine', 'ids').split(',')]
 except:
@@ -56,6 +57,7 @@ except:
     pbIds      = [0]
     pbAreaCode = ''
 
+    tamPath    = 'FRITZ/voicebox'
     tamNames   = [strTAM]
     tamIds     = [0]
 
@@ -74,7 +76,8 @@ strTAMTitle    = 'FRITZ!Box {}'.format(tamNames[tamIds.index(tamId)])
 Message        = namedtuple('Message', 'datalength sequence type filelength reclength new callerID filename path day month year hours minutes seconds calledID')
 recordSize     = 348
 
-url            = 'ftp://{}:{}@{}/FRITZ/voicebox/meta{}'.format(fbFTPUsr, fbFTPPwd, fbAddr, tamId)
+#url            = 'ftp://{}:{}@{}/FRITZ/voicebox/meta{}'.format(fbFTPUsr, fbFTPPwd, fbAddr, tamId)
+url            = 'ftp://{}:{}@{}/{}/meta{}'.format(fbFTPUsr, fbFTPPwd, fbAddr, tamPath, tamId)
 
 tmpPath        = gettempdir()
 tamFile        = os.path.join(tmpPath, 'meta' + str(tamId))
