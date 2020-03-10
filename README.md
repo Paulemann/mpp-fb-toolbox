@@ -23,6 +23,7 @@ Improvements:
 You must configure a name for each id which may differ from the name that's specified in the FRITZ!Box ui. 
 - You may now configure multiple answering machines in fb.cfg under the new section [answering machine]. The configuration follows the same scheme as for the phone books. 
 - In case you've configured your box to use a user name and password combo instead of password only for login you can now configure the user name in fb.cfg. 
+- For those who store their voicebox files on external media, you can now configure the path in fb.cfg in the [answering machine] section. 
 
 Optional:
 =========
@@ -48,6 +49,7 @@ ids:      <Phonebook ids, separated by comma if there are multiple; e.g. 0, 1>
 areacode: <Optional: your own area code; will shorten the display of local numbers>
 
 [answering machine]
+path:     <Path to voicebox files; Default: 'FRITZ/voicebox'>
 names:    <Answering machine names, separated by comma if there are multiple; e.g. Anrufbeantworter, AB 2>
 ids:      <Answering machine ids, separated by comma if there are multiple; e.g. 0, 1>
 
