@@ -29,6 +29,7 @@ Optional:
 =========
 - If you have a webcam that can generate snapshots in jpeg format, a menu entry is added by configuration of the respective snapshot url to display the snapshot on the screen of your Cisco IP phone.
 - It is not a strict prerequisite, but it makes sense that - prior to the installation of the scripts - you have setup the Cisco 8800 IP Phone to register as a SIP client at your local FRITZ!Box and you are able to make calls with your phone. See section "Setup Cisco 8800 Series Multiplatform Phone (MPP) with AVM FRITZ!Box" if you're looking for guidance on how to setup the phone.
+- Added fb_phonebook.cgi.alphabet as an optional replacement for fb_phonebook.cgi. The alternativ script offers pagewise grouping of entries by starting letters. Additionally, you may jump from 1st to last page and vice versa (page rotation). To use ist, simply copy fb_phonebook.cgi.alphabet to fb_phonebook.cgi
 
 Test the installation by entering `http://<Web server IP address>/cgi-bin/fb_services.cgi` in the address field of your brwoser. You should be able to see the XML code the script has generated. If not, you must troubleshoot your setup.
 
