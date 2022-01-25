@@ -1,13 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import urllib2
+#import urllib.request, urllib.parse, urllib.error
+from urllib.request import build_opener, Request, HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, HTTPDigestAuthHandler
 import os
 import sys
 from io import BytesIO
 from PIL import Image, ImageOps
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
+import base64, codecs
 cfgFile = 'fb.cfg'
 
 try:
@@ -29,14 +31,14 @@ def get_snapshot(url, username, password):
     global opener
 
     if not opener:
-        passwd_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        passwd_mgr = HTTPPasswordMgrWithDefaultRealm()
         passwd_mgr.add_password(None, url, username, password)
 
-        opener = urllib2.build_opener()
-        opener.add_handler(urllib2.HTTPBasicAuthHandler(passwd_mgr))
-        opener.add_handler(urllib2.HTTPDigestAuthHandler(passwd_mgr))
+        opener = build_opener()
+        opener.add_handler(HTTPBasicAuthHandler(passwd_mgr))
+        opener.add_handler(HTTPDigestAuthHandler(passwd_mgr))
 
-    request = urllib2.Request(url)
+    request = Request(url)
     imgData = opener.open(request).read()
 
     return imgData
@@ -56,5 +58,9 @@ with BytesIO() as output:
     image.save(output, format='PNG')
     contents = output.getvalue()
 
-print html_header
-print contents
+#print(html_header)
+#sys.stdout.flush()
+# or
+sys.stdout.buffer.write(b'Content-Type: image/png\n\n')
+
+sys.stdout.buffer.write(contents + b'\n')

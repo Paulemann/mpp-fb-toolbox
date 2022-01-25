@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
 from struct import *
@@ -7,11 +7,11 @@ from collections import namedtuple
 from datetime import datetime
 from tempfile import gettempdir
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import re
 import os
 
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 
 # Localization:
@@ -90,7 +90,7 @@ except:
 
 messages = []
 try:
-    urllib.urlretrieve(url, tamFile)
+    urllib.request.urlretrieve(url, tamFile)
     with open(tamFile, 'rb') as fin:
         for record in iter(partial(fin.read, recordSize), b''):
             # Byte order
@@ -160,7 +160,7 @@ def outputLine(msg):
     Line = '\t<MenuItem>\n\t\t<Name>{} {} {}: {} ({})</Name>\n\t\t<URL>Dial:{}</URL>\n\t</MenuItem>'
     #Line = '\t<DirectoryEntry>\n\t\t<Name>{} {} {}: {} ({})</Name>\n\t\t<Telephone>{}</Telephone>\n\t</DirectoryEntry>'
 
-    print Line.format(locDayOfWeek, dateStr, timeStr, callerID, lenStr, msg.callerID.rstrip('\0'))
+    print(Line.format(locDayOfWeek, dateStr, timeStr, callerID, lenStr, msg.callerID.rstrip('\0')))
 
 
 # mime type / html header
@@ -175,19 +175,19 @@ footer = '</CiscoIPPhoneMenu>'
 
 softKey = '\t<SoftKeyItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t\t<Position>{}</Position>\n\t</SoftKeyItem>'
 
-print html_header
+print(html_header)
 if error:
-    print header.format(strTAMTitle, strError)
+    print(header.format(strTAMTitle, strError))
 else:
-    print header.format(strTAMTitle, str(newmsgs) + strNewMessages)
+    print(header.format(strTAMTitle, str(newmsgs) + strNewMessages))
 
 # read messages in reverse order
 for message in messages[::-1]:
     outputLine(message)
 
 if newmsgs > 0:
-    print softKey.format(btnDialID,'SoftKey:Select', 1)
-print softKey.format(btnDialTAM, 'Dial:**60' + str(tamId), 2)
-print softKey.format(btnExit, 'Init:Services', 3)
+    print(softKey.format(btnDialID,'SoftKey:Select', 1))
+print(softKey.format(btnDialTAM, 'Dial:**60' + str(tamId), 2))
+print(softKey.format(btnExit, 'Init:Services', 3))
 
-print footer
+print(footer)

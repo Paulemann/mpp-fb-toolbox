@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
 import os
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from fb_toolbox import *
 
 
@@ -53,7 +53,7 @@ if 'QUERY_STRING' in os.environ:
 
 strPrompt = lstPrompt[ type - 1 ]
 
-page = getPage(fbAddr, sid, "/fon_num/foncalls_list.lua?sid=" + sid + "&csv=")
+page = getPage(fbAddr, sid, '/fon_num/foncalls_list.lua', values={'csv': ''}).decode()
 
 # mime type / html header
 html_header = 'Content-type: text/xml\n'
@@ -65,8 +65,8 @@ footer = '</CiscoIPPhoneMenu>'
 softKey = '\t<SoftKeyItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t\t<Position>{}</Position>\n\t</SoftKeyItem>'
 outLine = '\t<MenuItem>\n\t\t<Name>{}: {}</Name>\n\t\t<URL>Dial:{}</URL>\n\t</MenuItem>'
 
-print html_header
-print header.format(strTitle, strPrompt)
+print(html_header)
+print(header.format(strTitle, strPrompt))
 
 for line in page.split('\n'):
     try:
@@ -76,11 +76,11 @@ for line in page.split('\n'):
 
     if calltype == str(type):
         if callerName:
-            print outLine.format(timestamp, callerName.replace('&', '&amp;'), callerID)
+            print(outLine.format(timestamp, callerName.replace('&', '&amp;'), callerID))
         else:
-            print outLine.format(timestamp, callerID, callerID)
+            print(outLine.format(timestamp, callerID, callerID))
 
-print softKey.format(btnDial, 'SoftKey:Select', 1)
-print softKey.format(btnExit, 'Init:Services', 3)
+print(softKey.format(btnDial, 'SoftKey:Select', 1))
+print(softKey.format(btnExit, 'Init:Services', 3))
 
-print footer
+print(footer)

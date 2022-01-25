@@ -1,38 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
-#######################################################################################################################
-#
-#    Python prototype which logs on to a Fritz AVM 7390 and
-#    extracts the number of sent and received bytes of
-#    today, yesterday, last week and last month
-#
-#    Visit https://github.com/framps/pythonScriptCollection for latest code and other details
-#
-#######################################################################################################################
-#
-#    Copyright (C) 2013 framp at linux-tips-and-tricks dot de
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#######################################################################################################################
 
-import httplib
-from xml.dom import minidom
 import hashlib
 import re
-import sys
 import os
 import stat
 import mimetypes
@@ -40,28 +10,49 @@ import socket
 import fcntl
 import struct
 
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode
+from urllib.error import URLError, HTTPError
+from xml.etree.ElementTree import parse, dump
+from time import sleep
+
+
+_debug = False
+
 USER_AGENT="Mozilla/5.0 (U; Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0"
+
 
 def get_ip_address(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     return socket.inet_ntoa(fcntl.ioctl(
         s.fileno(),
         0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
+        struct.pack('256s', ifname[:15].encode('utf-8'))
     )[20:24])
 
+
 def post_multipart(host, selector, fields, files):
+    uri='http://' + host + selector
+
     content_type, body = _encode_multipart_formdata(fields, files)
-    h = httplib.HTTPConnection(host)
+    data = body.encode()
+
     headers = {
-        #'User-Agent': 'python_multipart_caller',
         'User-Agent': USER_AGENT,
         'Content-Type': content_type,
         'Accept': '*/*'
         }
-    h.request('POST', selector, body, headers)
-    res = h.getresponse()
-    return res.read()
+
+    req = Request(uri, data=data, headers=headers)
+
+    try:
+        with  urlopen(req) as response:
+            ret = response.read()
+    except (HTTPError, URLError) as e:
+       return None
+
+    return ret
+
 
 def _encode_multipart_formdata(fields, files):
     BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
@@ -87,73 +78,84 @@ def _encode_multipart_formdata(fields, files):
     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
     return content_type, body
 
-def getPage(server, sid, page, port=80):
 
-    conn = httplib.HTTPConnection(server+':'+str(port))
+def loginToServer(ipaddr, user, password, port=80):
+    uri = 'http://{}:{}/login_sid.lua'.format(ipaddr, port)
+    hdr = {'User-Agent': USER_AGENT}
 
-    headers = { "Accept" : "application/xml",
-                "Content-Type" : "text/plain",
-                "User-Agent" : USER_AGENT}
+    req = Request(uri, headers=hdr)
 
-    pageWithSid=page+"?sid="+sid
-    conn.request("GET", pageWithSid, '', headers)
-    response = conn.getresponse()
-    data = response.read()
-    if response.status != 200:
-        #print "%s %s" % (response.status, response.reason)
-        #print data
-        sys.exit(1)
-    else:
-        return data
+    try:
+        with urlopen(req) as response:
+            dom = parse(response)
+            sid = dom.findtext('./SID')
+            challenge = dom.findtext('./Challenge')
+    except (HTTPError, URLError) as e:
+        if _debug:
+            print(e)
+        return None
 
-def loginToServer(server, user, password, port=80):
+    #if sid == '0000000000000000':
+    retry = True
+    while sid == '0000000000000000' and retry:
+        md5 = hashlib.md5()
+        md5.update(challenge.encode('utf-16le'))
+        md5.update('-'.encode('utf-16le'))
+        md5.update(password.encode('utf-16le'))
 
-    conn = httplib.HTTPConnection(server+':'+str(port))
+        resp = challenge + '-' + md5.hexdigest().lower()
 
-    headers = { "Accept" : "application/xml",
-                "Content-Type" : "text/plain",
-                "User-Agent" : USER_AGENT}
-
-    initialPage='/login_sid.lua'
-    conn.request("GET", initialPage, '', headers)
-    response = conn.getresponse()
-    data = response.read()
-    if response.status != 200:
-        #print "%s %s" % (response.status, response.reason)
-        #print data
-        sys.exit(1)
-    else:
-        theXml = minidom.parseString(data)
-        sidInfo = theXml.getElementsByTagName('SID')
-        sid=sidInfo[0].firstChild.data
-        if sid == "0000000000000000":
-            challengeInfo = theXml.getElementsByTagName('Challenge')
-            challenge=challengeInfo[0].firstChild.data
-            challenge_bf = (challenge + '-' + password).decode('iso-8859-1').encode('utf-16le')
-            m = hashlib.md5()
-            m.update(challenge_bf)
-            response_bf = challenge + '-' + m.hexdigest().lower()
+        if user:
+            data = urlencode({'username': user, 'response': resp}).encode()
         else:
-            return sid
+            data = urlencode({'response': resp}).encode()
 
-    headers = { "Accept" : "text/html,application/xhtml+xml,application/xml",
-                "Content-Type" : "application/x-www-form-urlencoded",
-                "User-Agent" : USER_AGENT}
+        try:
+            with urlopen(req, data=data) as response:
+                dom = parse(response)
+                sid = dom.findtext('./SID')
+                blocktime = int(dom.findtext('./BlockTime'))
+                if sid == '0000000000000000' and blocktime > 0:
+                    sleep(blocktime + 1)
+                    if _debug:
+                        dump(dom.getroot())
+                        print('Block Time:', blocktime)
+                else:
+                    retry = False
 
-    if not user:
-        loginPage="/login_sid.lua?&response=" + response_bf
-    else:
-        loginPage="/login_sid.lua?username=" + user + "&response=" + response_bf
-    conn.request("GET", loginPage, '', headers)
-    response = conn.getresponse()
-    data = response.read()
-    if response.status != 200:
-        #print "%s %s" % (response.status, response.reason)
-        #print data
-        sys.exit(1)
-    else:
-        sid = re.search('<SID>(.*?)</SID>', data).group(1)
-        if sid == "0000000000000000":
-            #print "ERROR - No SID received because of invalid password"
-            sys.exit(1)
-        return sid
+        except (HTTPError, URLError) as e:
+            if _debug:
+                print(e)
+            return None
+
+    if _debug:
+        dump(dom.getroot())
+        print('Session ID:', sid)
+
+    if sid == '0000000000000000':
+        return None
+
+    return sid
+
+
+def getPage(ipaddr, sid, page, values=None, port=80):
+    uri = 'http://{}:{}/{}'.format(ipaddr, port, page[1:] if page[0] == '/' else page)
+    hdr = {'User-Agent': USER_AGENT}
+
+    if not values:
+        values = {}
+    values['sid'] = sid
+
+    data = urlencode(values).encode()
+
+    req = Request(uri, data=data, headers=hdr)
+
+    try:
+        with urlopen(req) as response:
+            page = response.read()
+    except (HTTPError, URLError) as e:
+        if _debug:
+            print(e)
+        return None
+
+    return page
