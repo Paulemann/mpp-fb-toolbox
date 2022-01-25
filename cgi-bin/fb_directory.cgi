@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -6,7 +6,7 @@ import socket
 import fcntl
 import struct
 from fb_toolbox import get_ip_address
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 
 # Localization
@@ -39,9 +39,9 @@ footer = '</CiscoIPPhoneMenu>'
 
 outLine = '\t<MenuItem>\n\t\t<Name>{}</Name>\n\t\t<URL>{}</URL>\n\t</MenuItem>'
 
-print html_header
-print header.format(strPBTitle, strPBPrompt)
+print(html_header)
+print(header.format(strPBTitle, strPBPrompt))
 for pbId in pbIds:
     pbName  = pbNames[pbIds.index(pbId)]
-    print outLine.format(pbName, url.format(pbId))
-print footer
+    print(outLine.format(pbName, url.format(pbId)))
+print(footer)
