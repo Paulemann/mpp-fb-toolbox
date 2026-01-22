@@ -13,10 +13,6 @@ Prerequisites:
 - Make sure the script files are executable both locally and by the web service.
 - Furthermore, you should be able to access the admin page and be familar with the basic setup of your Cisco 8800 Series Multiplatform Phone. 
 
-Restrictions:
-=============
-- Currently the location where the phonebook and answering machines file are stored is hardcoded as `/tmp/`. If this path is not accessible or doesn't exist  you must edit the value of tmpPath or pbPath, respectively, in the files fb_phonebook.cgi and fb_tam.cgi. 
-
 Improvements:
 =============
 - The structure of fb.cfg has been changed to allow the use of multiple phone books. Phone books are referenced by their owner/id: 0 = main phonebook, 1-239 = user defined phonebooks, 240-253 = online phonebooks, 255 = intern, 256 = clip info.
@@ -29,7 +25,6 @@ Optional:
 =========
 - If you have a webcam that can generate snapshots in jpeg format, a menu entry is added by configuration of the respective snapshot url to display the snapshot on the screen of your Cisco IP phone.
 - It is not a strict prerequisite, but it makes sense that - prior to the installation of the scripts - you have setup the Cisco 8800 IP Phone to register as a SIP client at your local FRITZ!Box and you are able to make calls with your phone. See section "Setup Cisco 8800 Series Multiplatform Phone (MPP) with AVM FRITZ!Box" if you're looking for guidance on how to setup the phone.
-- Added fb_phonebook.cgi.alphabet as an optional replacement for fb_phonebook.cgi. The alternativ script offers pagewise grouping of entries by starting letters. Additionally, you may jump from 1st to last page and vice versa (page rotation). To use ist, simply copy fb_phonebook.cgi.alphabet to fb_phonebook.cgi
 
 Test the installation by entering `http://<Web server IP address>/cgi-bin/fb_services.cgi` in the address field of your brwoser. You should be able to see the XML code the script has generated. If not, you must troubleshoot your setup.
 
@@ -154,7 +149,7 @@ Locale: de-DE
 
 Configuration:
 ==============
-`http://<IP-Adresse>` -> login as user "user" and previously assigne password  -> Admin-Login (advanced)
+`http://<IP-Adresse>` -> login as user "user" and previously assigned password  -> Admin-Login (advanced)
 
 Voice -> System
 ```
